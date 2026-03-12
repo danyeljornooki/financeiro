@@ -10,11 +10,13 @@ import DashboardCards from "../src/components/DashboardCards"
 import DashboardInsights from "../src/components/DashboardInsights"
 import FinanceiroAvancado from "../src/components/FinanceiroAvancado"
 import ReceitasTable from "../src/components/ReceitasTable"
+import SecurityPanel from "../src/components/SecurityPanel"
 import { sincronizarAutomacoes } from "../src/lib/contas"
 import { SectionTitle, ShellCard } from "../src/components/ui"
 
 export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0)
+  const [currentSection, setCurrentSection] = useState("overview")
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)
   )
@@ -56,60 +58,74 @@ export default function Home() {
       selectedMonth={selectedMonth}
       onSelectedMonthChange={setSelectedMonth}
       onLogout={sair}
+      currentSection={currentSection}
+      onSectionChange={setCurrentSection}
     >
-      <section id="overview">
-        <DashboardCards refreshKey={refreshKey} selectedMonth={selectedMonth} />
-      </section>
-
-      <section id="analytics">
-        <DashboardInsights refreshKey={refreshKey} selectedMonth={selectedMonth} />
-      </section>
-
-      <AlertasVencimento refreshKey={refreshKey} />
-
-      <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-4">
-          <SectionTitle
-            eyebrow="Operacao"
-            title="Registrar movimento"
-            description="Crie novas receitas e despesas com o mesmo acabamento visual do dashboard."
-          />
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <AddReceita onSaved={atualizarLista} />
-            <AddConta onSaved={atualizarLista} />
-          </div>
+      {currentSection === "overview" ? (
+        <div className="space-y-6">
+          <section id="overview">
+            <DashboardCards refreshKey={refreshKey} selectedMonth={selectedMonth} />
+          </section>
+          <AlertasVencimento refreshKey={refreshKey} />
+          <ShellCard className="p-6">
+            <SectionTitle
+              eyebrow="Operacao"
+              title="Movimentos do periodo"
+              description="Acesso rapido ao registro de receitas e despesas sem sair da visao geral."
+            />
+            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <AddReceita onSaved={atualizarLista} />
+              <AddConta onSaved={atualizarLista} />
+            </div>
+          </ShellCard>
         </div>
+      ) : null}
 
-        <section id="planejamento">
+      {currentSection === "receitas" ? (
+        <section id="receitas" className="space-y-6">
+          <AddReceita onSaved={atualizarLista} />
+          <ShellCard className="p-6">
+            <SectionTitle
+              eyebrow="Fluxo de caixa"
+              title="Receitas do periodo"
+              description="Visualize, ajuste e acompanhe entradas financeiras usando o filtro mensal global."
+            />
+            <div className="mt-6">
+              <ReceitasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
+            </div>
+          </ShellCard>
+        </section>
+      ) : null}
+
+      {currentSection === "despesas" ? (
+        <section id="despesas" className="space-y-6">
+          <AlertasVencimento refreshKey={refreshKey} />
+          <AddConta onSaved={atualizarLista} />
+          <ShellCard className="p-6">
+            <SectionTitle
+              eyebrow="Contas"
+              title="Despesas e compromissos"
+              description="Monitore despesas, status, recorrencias e historico em uma grade refinada."
+            />
+            <div className="mt-6">
+              <ContasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
+            </div>
+          </ShellCard>
+        </section>
+      ) : null}
+
+      {currentSection === "analytics" ? (
+        <section id="analytics" className="space-y-6">
+          <DashboardInsights refreshKey={refreshKey} selectedMonth={selectedMonth} />
           <FinanceiroAvancado refreshKey={refreshKey} />
         </section>
-      </div>
+      ) : null}
 
-      <section id="receitas">
-        <ShellCard className="p-6">
-        <SectionTitle
-          eyebrow="Fluxo de caixa"
-          title="Receitas do periodo"
-          description="Visualize, ajuste e acompanhe entradas financeiras usando o filtro mensal global."
-        />
-        <div className="mt-6">
-          <ReceitasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
-        </div>
-        </ShellCard>
-      </section>
-
-      <section id="despesas">
-        <ShellCard className="p-6">
-        <SectionTitle
-          eyebrow="Contas"
-          title="Despesas e compromissos"
-          description="Monitore despesas, status, recorrencias e historico em uma grade refinada."
-        />
-        <div className="mt-6">
-          <ContasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
-        </div>
-        </ShellCard>
-      </section>
+      {currentSection === "security" ? (
+        <section id="security">
+          <SecurityPanel refreshKey={refreshKey} />
+        </section>
+      ) : null}
     </AppShell>
   )
 }

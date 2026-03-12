@@ -15,7 +15,7 @@ import {
   WalletCards,
   X,
 } from "lucide-react"
-import { ReactNode, useState } from "react"
+import { ReactNode, useMemo, useState } from "react"
 import { DataPill, PremiumButton, PremiumInput, ShellCard, cx } from "./ui"
 
 type Props = {
@@ -23,29 +23,62 @@ type Props = {
   selectedMonth: string
   onSelectedMonthChange: (value: string) => void
   onLogout: () => Promise<void>
+  currentSection: string
+  onSectionChange: (value: string) => void
 }
 
 const navItems = [
-  { label: "Visao geral", icon: LayoutDashboard, id: "overview", active: true },
+  { label: "Visao geral", icon: LayoutDashboard, id: "overview" },
   { label: "Receitas", icon: HandCoins, id: "receitas" },
   { label: "Despesas", icon: CreditCard, id: "despesas" },
   { label: "Analytics", icon: ChartColumnBig, id: "analytics" },
-  { label: "Seguranca", icon: ShieldCheck, id: "planejamento" },
+  { label: "Seguranca", icon: ShieldCheck, id: "security" },
 ]
+
+const sectionMeta: Record<string, { eyebrow: string; title: string; description: string }> = {
+  overview: {
+    eyebrow: "Workspace",
+    title: "Visao geral financeira",
+    description: "Resumo premium do periodo com indicadores centrais e visibilidade imediata.",
+  },
+  receitas: {
+    eyebrow: "Receitas",
+    title: "Entradas do periodo",
+    description: "Cadastre, acompanhe e ajuste receitas com foco no fluxo de caixa mensal.",
+  },
+  despesas: {
+    eyebrow: "Despesas",
+    title: "Saidas e compromissos",
+    description: "Gerencie contas, vencimentos, status e automacoes financeiras em um unico bloco.",
+  },
+  analytics: {
+    eyebrow: "Analytics",
+    title: "Analise e planejamento",
+    description: "Graficos, tendencias, metas e simulacoes para leitura executiva do negocio.",
+  },
+  security: {
+    eyebrow: "Seguranca",
+    title: "Acesso e protecao",
+    description: "Monitore autenticacao, logs recentes e o estado das protecoes do sistema.",
+  },
+}
 
 export default function AppShell({
   children,
   selectedMonth,
   onSelectedMonthChange,
   onLogout,
+  currentSection,
+  onSectionChange,
 }: Props) {
   const [open, setOpen] = useState(false)
-  const [currentSection, setCurrentSection] = useState("overview")
+  const activeMeta = useMemo(
+    () => sectionMeta[currentSection] ?? sectionMeta.overview,
+    [currentSection]
+  )
 
   function handleNavigate(sectionId: string) {
-    setCurrentSection(sectionId)
-    const target = document.getElementById(sectionId)
-    target?.scrollIntoView({ behavior: "smooth", block: "start" })
+    onSectionChange(sectionId)
     setOpen(false)
   }
 
@@ -79,7 +112,7 @@ export default function AppShell({
                   onClick={() => handleNavigate(item.id)}
                   className={cx(
                     "group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-medium transition",
-                    currentSection === item.id || item.active && currentSection === "overview"
+                    currentSection === item.id
                       ? "bg-[linear-gradient(135deg,#0f172a,#1d4ed8)] text-white shadow-[0_18px_34px_-18px_rgba(15,23,42,0.8)]"
                       : "text-slate-600 hover:bg-white hover:text-slate-950 hover:shadow-[0_14px_28px_-22px_rgba(15,23,42,0.45)]"
                   )}
@@ -131,13 +164,13 @@ export default function AppShell({
 
                   <div>
                     <div className="mb-1 text-xs font-semibold uppercase tracking-[0.26em] text-sky-600">
-                      Workspace
+                      {activeMeta.eyebrow}
                     </div>
                     <h1 className="text-3xl font-semibold tracking-[-0.06em] text-slate-950 md:text-4xl">
-                      Painel financeiro premium
+                      {activeMeta.title}
                     </h1>
                     <p className="mt-1 text-sm text-slate-500">
-                      Receitas, despesas, previsoes e operacao segura em uma unica visao.
+                      {activeMeta.description}
                     </p>
                   </div>
                 </div>
