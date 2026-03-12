@@ -18,7 +18,7 @@ function isPublicPath(pathname: string) {
   )
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (isPublicPath(pathname)) {
@@ -45,7 +45,7 @@ export function middleware(request: NextRequest) {
       type: "access_denied",
       ip: readClientIp(request),
       path: pathname,
-      detail: "middleware blocked anonymous access",
+      detail: "proxy blocked anonymous access",
     })
 
     if (pathname.startsWith("/api/")) {

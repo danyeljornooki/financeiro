@@ -36,7 +36,7 @@ O projeto já está estruturado como uma aplicação SaaS/fintech de uso privado
 O projeto foi estruturado para não depender de acesso direto do frontend ao banco:
 
 - senha global antes de entrar no app
-- `middleware` protegendo páginas e APIs
+- `proxy` protegendo páginas e APIs
 - rate limit de login: `5 tentativas por minuto`
 - logs de acesso e tentativas
 - `RLS` no Supabase
@@ -138,7 +138,7 @@ Antes de usar tudo em produção, aplique essas migrations no Supabase.
 ## Fluxo da aplicação
 
 1. O usuário acessa o app e passa pela autenticação por senha global.
-2. O `middleware` valida o cookie antes de liberar páginas e rotas.
+2. O `proxy` valida o cookie antes de liberar páginas e rotas.
 3. O frontend consome apenas as APIs internas do Next.
 4. As APIs usam `supabaseAdmin` no servidor para operar em `contas` e `receitas`.
 5. O dashboard consolida receitas, despesas, saldo e módulos analíticos.
@@ -147,7 +147,7 @@ Antes de usar tudo em produção, aplique essas migrations no Supabase.
 
 - Os logs e o rate limit atuais ficam em memória do servidor.
 - Em ambiente serverless, isso funciona como proteção básica, não como auditoria persistente.
-- O Next 16 mostra aviso de depreciação para `middleware`; a migração futura é para `proxy`.
+- O projeto já usa `proxy.ts`, que substitui `middleware.ts` no Next 16.
 
 ## Próximos passos possíveis
 
@@ -155,7 +155,6 @@ Antes de usar tudo em produção, aplique essas migrations no Supabase.
 - mover rate limit para Redis ou armazenamento externo
 - adicionar exportação PDF/CSV
 - adicionar múltiplos usuários com autenticação real
-- migrar `middleware` para `proxy`
 
 ## Estado atual
 
