@@ -1,36 +1,162 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Financeiro Control Hub
 
-## Getting Started
+Painel financeiro em `Next.js` com foco em uso real: receitas, despesas, dashboard visual, automações, segurança por senha global e integração com `Supabase`.
 
-First, run the development server:
+O projeto já está estruturado como uma aplicação SaaS/fintech de uso privado, com frontend premium, APIs protegidas e banco acessado no servidor via `service_role`.
+
+## Stack
+
+- `Next.js 16` com App Router
+- `React 19`
+- `Tailwind CSS 4`
+- `Supabase`
+- `Recharts`
+- `Framer Motion`
+- `Lucide React`
+- `TypeScript`
+
+## O que o sistema faz
+
+- Cadastro e edição de despesas
+- Cadastro e edição de receitas mensais
+- Dashboard com cards financeiros
+- Gráficos por categoria, mês e tendência
+- Top gastos e projeção de saldo
+- Contas recorrentes e parcelamento
+- Status automático de contas atrasadas
+- Alertas de vencimento
+- Histórico e ações rápidas nas tabelas
+- Planejamento financeiro anual
+- Simulação de economia mensal
+- Metas financeiras e controle de dívidas
+- Área de segurança com logs de acesso
+
+## Segurança
+
+O projeto foi estruturado para não depender de acesso direto do frontend ao banco:
+
+- senha global antes de entrar no app
+- `middleware` protegendo páginas e APIs
+- rate limit de login: `5 tentativas por minuto`
+- logs de acesso e tentativas
+- `RLS` no Supabase
+- `service_role` usada apenas no servidor
+- APIs internas para `contas`, `receitas` e `security/logs`
+
+## Variáveis de ambiente
+
+Crie um arquivo `.env.local` com:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+APP_PASSWORD=...
+APP_AUTH_SECRET=...
+```
+
+Notas:
+
+- `APP_PASSWORD` é a senha geral do sistema
+- `APP_AUTH_SECRET` é usado para compor o token do cookie de autenticação
+- `SUPABASE_SERVICE_ROLE_KEY` nunca deve ser exposta no cliente
+
+## Rodando localmente
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Suba o ambiente de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npx tsc --noEmit
+```
 
-## Learn More
+## Estrutura principal
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/
+  api/
+    auth/
+    contas/
+    receitas/
+    security/
+  login/
+  layout.tsx
+  page.tsx
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+src/
+  components/
+    AddConta.tsx
+    AddReceita.tsx
+    AlertasVencimento.tsx
+    AppShell.tsx
+    ContasTable.tsx
+    DashboardCards.tsx
+    DashboardInsights.tsx
+    FinanceiroAvancado.tsx
+    ReceitasTable.tsx
+    SecurityPanel.tsx
+    ui.tsx
+  lib/
+    api-auth.ts
+    auth.ts
+    contas.ts
+    receitas.ts
+    supabase-admin.ts
+    supabase.ts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+supabase/
+  migrations/
+```
 
-## Deploy on Vercel
+## Banco e migrations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+As migrations do projeto estão em:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `supabase/migrations/20260312_financeiro_features.sql`
+- `supabase/migrations/20260312_receitas.sql`
+- `supabase/migrations/20260312_security_rls.sql`
+
+Antes de usar tudo em produção, aplique essas migrations no Supabase.
+
+## Fluxo da aplicação
+
+1. O usuário acessa o app e passa pela autenticação por senha global.
+2. O `middleware` valida o cookie antes de liberar páginas e rotas.
+3. O frontend consome apenas as APIs internas do Next.
+4. As APIs usam `supabaseAdmin` no servidor para operar em `contas` e `receitas`.
+5. O dashboard consolida receitas, despesas, saldo e módulos analíticos.
+
+## Observações
+
+- Os logs e o rate limit atuais ficam em memória do servidor.
+- Em ambiente serverless, isso funciona como proteção básica, não como auditoria persistente.
+- O Next 16 mostra aviso de depreciação para `middleware`; a migração futura é para `proxy`.
+
+## Próximos passos possíveis
+
+- persistir logs de segurança em tabela própria
+- mover rate limit para Redis ou armazenamento externo
+- adicionar exportação PDF/CSV
+- adicionar múltiplos usuários com autenticação real
+- migrar `middleware` para `proxy`
+
+## Estado atual
+
+O projeto está preparado para uso como painel financeiro privado, com backend protegido, UI moderna e base adequada para evolução em produção.
