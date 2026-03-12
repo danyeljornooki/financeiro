@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { ensureAuthorized } from "@/src/lib/api-auth"
-import { supabaseAdmin } from "@/src/lib/supabase-admin"
+import { getSupabaseAdmin } from "@/src/lib/supabase-admin"
 
 type Context = {
   params: Promise<{ id: string }>
@@ -9,6 +9,13 @@ type Context = {
 export async function PUT(request: Request, { params }: Context) {
   const unauthorized = ensureAuthorized(request)
   if (unauthorized) return unauthorized
+
+  let supabaseAdmin
+  try {
+    supabaseAdmin = getSupabaseAdmin()
+  } catch {
+    return NextResponse.json({ error: "Supabase admin nao configurado" }, { status: 500 })
+  }
 
   const { id } = await params
   const body = (await request.json()) as Record<string, unknown>
@@ -29,6 +36,13 @@ export async function PUT(request: Request, { params }: Context) {
 export async function DELETE(request: Request, { params }: Context) {
   const unauthorized = ensureAuthorized(request)
   if (unauthorized) return unauthorized
+
+  let supabaseAdmin
+  try {
+    supabaseAdmin = getSupabaseAdmin()
+  } catch {
+    return NextResponse.json({ error: "Supabase admin nao configurado" }, { status: 500 })
+  }
 
   const { id } = await params
 

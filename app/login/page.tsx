@@ -1,9 +1,9 @@
 "use client"
 
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [password, setPassword] = useState("")
@@ -66,5 +66,13 @@ export default function LoginPage() {
         </button>
       </div>
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-neutral-100" />}>
+      <LoginContent />
+    </Suspense>
   )
 }

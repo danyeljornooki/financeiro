@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server"
 import { ensureAuthorized } from "@/src/lib/api-auth"
-import { supabaseAdmin } from "@/src/lib/supabase-admin"
+import { getSupabaseAdmin } from "@/src/lib/supabase-admin"
 
 export async function GET(request: Request) {
   const unauthorized = ensureAuthorized(request)
   if (unauthorized) return unauthorized
+
+  let supabaseAdmin
+  try {
+    supabaseAdmin = getSupabaseAdmin()
+  } catch {
+    return NextResponse.json({ error: "Supabase admin nao configurado" }, { status: 500 })
+  }
 
   const { data, error } = await supabaseAdmin
     .from("receitas")
@@ -22,6 +29,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const unauthorized = ensureAuthorized(request)
   if (unauthorized) return unauthorized
+
+  let supabaseAdmin
+  try {
+    supabaseAdmin = getSupabaseAdmin()
+  } catch {
+    return NextResponse.json({ error: "Supabase admin nao configurado" }, { status: 500 })
+  }
 
   const body = (await request.json()) as Record<string, unknown>
 
