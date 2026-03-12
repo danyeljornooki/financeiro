@@ -16,9 +16,15 @@ export default function AddConta({ onSaved }: Props) {
   const [vencimento, setVencimento] = useState("")
   const [recorrencia, setRecorrencia] = useState<RecorrenciaConta>("unica")
   const [parcelas, setParcelas] = useState("1")
+  const [erro, setErro] = useState("")
 
   async function salvarConta() {
-    if (!descricao || !categoria || !valor) return
+    if (!descricao || !categoria || !valor) {
+      setErro("Preencha descricao, categoria e valor para salvar a despesa.")
+      return
+    }
+
+    setErro("")
 
     const { error } = await criarConta({
       descricao,
@@ -36,7 +42,10 @@ export default function AddConta({ onSaved }: Props) {
       historico_pagamentos: [],
     })
 
-    if (error) return
+    if (error) {
+      setErro(error instanceof Error ? error.message : "Nao foi possivel salvar a despesa.")
+      return
+    }
 
     setDescricao("")
     setCategoria("")
@@ -44,6 +53,7 @@ export default function AddConta({ onSaved }: Props) {
     setVencimento("")
     setRecorrencia("unica")
     setParcelas("1")
+    setErro("")
     onSaved?.()
   }
 
@@ -138,6 +148,7 @@ export default function AddConta({ onSaved }: Props) {
         </div>
 
         <div className="pt-2">
+          {erro ? <p className="mb-3 text-sm font-medium text-rose-600">{erro}</p> : null}
           <PremiumButton type="button" onClick={salvarConta} className="w-full md:w-auto">
             Salvar despesa
           </PremiumButton>
