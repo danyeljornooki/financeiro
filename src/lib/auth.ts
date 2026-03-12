@@ -2,7 +2,8 @@ import "server-only"
 
 import type { NextRequest } from "next/server"
 
-export const AUTH_COOKIE_NAME = "financeiro_auth"
+export const AUTH_COOKIE_NAME = "auth"
+export const AUTH_TOKEN_COOKIE_NAME = "auth_token"
 const LOGIN_WINDOW_MS = 60_000
 const MAX_ATTEMPTS = 5
 
@@ -61,21 +62,30 @@ export function readClientIp(request: NextRequest | Request) {
 }
 
 export function isAuthenticated(request: NextRequest | Request) {
-  const cookieHeader =
-    "cookies" in request
-      ? request.cookies.get(AUTH_COOKIE_NAME)?.value
-      : request.headers.get("cookie") || ""
-
-  if (typeof cookieHeader === "string" && !("cookies" in request)) {
-    const match = cookieHeader
-      .split(";")
-      .map((item) => item.trim())
-      .find((item) => item.startsWith(`${AUTH_COOKIE_NAME}=`))
-
-    return match?.split("=")[1] === authToken()
+  if ("cookies" in request) {
+    const authCookie = request.cookies.get(AUTH_COOKIE_NAME)?.value
+    const authTokenCookie = request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value
+    return authCookie === "true" && authTokenCookie === authToken()
   }
 
-  return cookieHeader === authToken()
+  const cookieHeader = request.headers.get("cookie") || ""
+  const cookies = new Map(
+    cookieHeader
+      .split(";")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => {
+        const separatorIndex = item.indexOf("=")
+        if (separatorIndex === -1) return [item, ""]
+
+        return [item.slice(0, separatorIndex), item.slice(separatorIndex + 1)]
+      })
+  )
+
+  return (
+    cookies.get(AUTH_COOKIE_NAME) === "true" &&
+    cookies.get(AUTH_TOKEN_COOKIE_NAME) === authToken()
+  )
 }
 
 export function registerAccessLog(entry: Omit<AccessLogEntry, "id" | "at">) {

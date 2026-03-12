@@ -7,7 +7,9 @@ function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [error, setError] = useState(
+    searchParams.get("error") === "config" ? "APP_PASSWORD nao configurado no servidor." : ""
+  )
   const [loading, setLoading] = useState(false)
 
   async function handleLogin() {

@@ -11,6 +11,7 @@ function isPublicPath(pathname: string) {
   return (
     pathname === "/login" ||
     pathname.startsWith("/api/auth/login") ||
+    pathname.startsWith("/api/auth/logout") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
     pathname.startsWith("/public")
@@ -20,12 +21,23 @@ function isPublicPath(pathname: string) {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (!isPasswordConfigured()) {
+  if (isPublicPath(pathname)) {
     return NextResponse.next()
   }
 
-  if (isPublicPath(pathname)) {
-    return NextResponse.next()
+  if (!isPasswordConfigured()) {
+    registerAccessLog({
+      type: "access_denied",
+      ip: readClientIp(request),
+      path: pathname,
+      detail: "APP_PASSWORD not configured",
+    })
+
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "APP_PASSWORD nao configurado" }, { status: 503 })
+    }
+
+    return NextResponse.redirect(new URL("/login?error=config", request.url))
   }
 
   if (!isAuthenticated(request)) {
@@ -49,5 +61,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!login|_next|favicon.ico).*)"],
 }
