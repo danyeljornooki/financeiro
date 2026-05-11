@@ -77,6 +77,17 @@ npm run dev
 
 Abra `http://localhost:3000`.
 
+## Deploy no Vercel
+
+Para deixar o projeto mais fluido online no Vercel:
+
+- não confirme `.env.local` no Git; use as variáveis de ambiente do painel do Vercel
+- configure `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `APP_PASSWORD` e `APP_AUTH_SECRET`
+- o `next.config.ts` já foi ajustado para `output: "standalone"`, o que melhora portabilidade em servidores Node.js
+- mantenha o projeto no ramo principal do Git e permita que o Vercel faça o build automático com `npm run build`
+
+Se quiser uma segunda camada de performance, podemos depois adicionar cache cliente com SWR/React Query e mover o rate limit/log para um armazenamento compartilhado (Redis ou Supabase).
+
 ## Scripts
 
 ```bash
