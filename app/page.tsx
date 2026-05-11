@@ -56,17 +56,17 @@ export default function Home() {
     >
       {currentSection === "overview" && (
         <div className="space-y-6">
-          <DashboardCards refreshKey={refreshKey} selectedMonth={selectedMonth} />
-          <AlertasVencimento refreshKey={refreshKey} />
+          <DashboardCards key={`cards-${refreshKey}`} refreshKey={refreshKey} selectedMonth={selectedMonth} />
+          <AlertasVencimento key={`alertas-${refreshKey}`} refreshKey={refreshKey} />
           <ShellCard className="p-6">
             <SectionTitle
-              eyebrow="Operação"
+              eyebrow="Operações"
               title="Entrada e saída rápida"
-              description="Registre receitas e despesas rapidamente sem perder o foco."
+              description="Registre receitas e despesas rapidamente."
             />
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
-              <AddReceita onSaved={atualizarLista} />
-              <AddConta onSaved={atualizarLista} />
+              <AddReceita key={`receita-${refreshKey}`} onSaved={atualizarLista} />
+              <AddConta key={`conta-${refreshKey}`} onSaved={atualizarLista} />
             </div>
           </ShellCard>
         </div>
@@ -77,14 +77,14 @@ export default function Home() {
           <ShellCard className="p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <SectionTitle
-                eyebrow="Fluxo de caixa"
-                title="Receitas do período"
-                description="Acompanhe as entradas e ajuste detalhes com um filtro mensal global."
+                eyebrow="Receitas"
+                title="Entradas do período"
+                description="Acompanhe as receitas com filtro mensal."
               />
-              <AddReceita onSaved={atualizarLista} />
+              <AddReceita key={`receita-${refreshKey}`} onSaved={atualizarLista} />
             </div>
             <div className="mt-6">
-              <ReceitasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
+              <ReceitasTable key={`receitas-table-${refreshKey}`} refreshKey={refreshKey} selectedMonth={selectedMonth} />
             </div>
           </ShellCard>
         </section>
@@ -95,24 +95,24 @@ export default function Home() {
           <ShellCard className="p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <SectionTitle
-                eyebrow="Contas"
-                title="Despesas e compromissos"
-                description="Veja status, vencimentos e histórico em uma visão compacta."
+                eyebrow="Despesas"
+                title="Contas e compromissos"
+                description="Gerencie despesas e acompanhe status."
               />
-              <AddConta onSaved={atualizarLista} />
+              <AddConta key={`conta-${refreshKey}`} onSaved={atualizarLista} />
             </div>
             <div className="mt-6">
-              <ContasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
+              <ContasTable key={`contas-table-${refreshKey}`} refreshKey={refreshKey} selectedMonth={selectedMonth} />
             </div>
           </ShellCard>
-          <AlertasVencimento refreshKey={refreshKey} />
+          <AlertasVencimento key={`alertas-${refreshKey}`} refreshKey={refreshKey} />
         </section>
       )}
 
       {currentSection === "analytics" && (
         <section className="space-y-6">
-          <DashboardInsights refreshKey={refreshKey} selectedMonth={selectedMonth} />
-          <FinanceiroAvancado refreshKey={refreshKey} />
+          <DashboardInsights key={`insights-${refreshKey}`} refreshKey={refreshKey} selectedMonth={selectedMonth} />
+          <FinanceiroAvancado key={`avancado-${refreshKey}`} refreshKey={refreshKey} />
         </section>
       )}
 

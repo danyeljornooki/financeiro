@@ -26,7 +26,7 @@ type Props = {
   selectedMonth: string
 }
 
-const COLORS = ["#0f766e", "#0284c7", "#6366f1", "#ea580c", "#dc2626", "#8b5cf6"]
+const COLORS = ["#0ea5e9", "#8b5cf6", "#f59e0b", "#ef4444", "#10b981", "#6366f1"]
 
 type MesItem = {
   mes: string
@@ -43,11 +43,11 @@ function tooltipMoney(
 }
 
 const tooltipStyle = {
-  borderRadius: 16,
-  border: "1px solid rgba(226,232,240,0.95)",
-  background: "rgba(255,255,255,0.98)",
-  boxShadow: "0 16px 32px -18px rgba(15,23,42,0.22)",
-  padding: "10px 14px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  boxShadow: "0 4px 12px -4px rgba(0,0,0,0.25)",
+  padding: "8px 12px",
 }
 
 export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Props) {
@@ -150,7 +150,7 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
     })
   }, [serieMensal])
 
-  const chartBaseClass = "rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-sm"
+  const chartBaseClass = "rounded-xl border border-border bg-surface p-5"
 
   return (
     <ShellCard className="p-6 md:p-7">
@@ -163,24 +163,24 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
       <div className="mt-6 grid grid-cols-1 gap-5 2xl:grid-cols-12">
         <div className={chartBaseClass + " 2xl:col-span-7"}>
           <div className="mb-4 flex items-center gap-3">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <CircleDollarSign className="h-5 w-5" />
             </span>
             <div>
-              <h3 className="font-semibold text-slate-950">Receitas vs despesas</h3>
-              <p className="text-sm text-slate-500">Evolucao dos ultimos seis meses</p>
+              <h3 className="font-semibold text-foreground">Receitas vs despesas</h3>
+              <p className="text-sm text-muted">Evolução dos últimos seis meses</p>
             </div>
           </div>
           <div className="h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={serieMensal} barGap={10}>
-                <CartesianGrid stroke="#e5edf6" strokeDasharray="3 6" vertical={false} />
-                <XAxis dataKey="mes" tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <Tooltip formatter={tooltipMoney} contentStyle={tooltipStyle} cursor={{ fill: "rgba(148,163,184,0.08)" }} />
+              <BarChart data={serieMensal} barGap={8}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
+                <XAxis dataKey="mes" tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
+                <Tooltip formatter={tooltipMoney} contentStyle={tooltipStyle} cursor={{ fill: "var(--border)" }} />
                 <Legend />
-                <Bar dataKey="receitas" fill="#0f766e" radius={[12, 12, 0, 0]} />
-                <Bar dataKey="despesas" fill="#be123c" radius={[12, 12, 0, 0]} />
+                <Bar dataKey="receitas" fill="var(--success)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="despesas" fill="var(--danger)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -188,19 +188,19 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
 
         <div className={chartBaseClass + " 2xl:col-span-5"}>
           <div className="mb-4 flex items-center gap-3">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <PieChartIcon className="h-5 w-5" />
             </span>
             <div>
-              <h3 className="font-semibold text-slate-950">Gastos por categoria</h3>
-              <p className="text-sm text-slate-500">Distribuicao das maiores categorias</p>
+              <h3 className="font-semibold text-foreground">Gastos por categoria</h3>
+              <p className="text-sm text-muted">Distribuição das maiores categorias</p>
             </div>
           </div>
           <div className="grid gap-4 lg:grid-cols-[210px_minmax(0,1fr)]">
             <div className="h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={categorias} dataKey="valor" nameKey="categoria" innerRadius={62} outerRadius={92} paddingAngle={3}>
+                  <Pie data={categorias} dataKey="valor" nameKey="categoria" innerRadius={50} outerRadius={80} paddingAngle={2}>
                     {categorias.map((entry) => (
                       <Cell key={entry.categoria} fill={entry.color} />
                     ))}
@@ -211,12 +211,12 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
             </div>
             <div className="space-y-3">
               {categorias.map((item) => (
-                <div key={item.categoria} className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+                <div key={item.categoria} className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5">
                   <div className="flex items-center gap-3">
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-sm font-medium text-slate-700">{item.categoria}</span>
+                    <span className="text-sm font-medium text-foreground">{item.categoria}</span>
                   </div>
-                  <span className="text-sm font-semibold text-slate-950">{item.percentual.toFixed(1)}%</span>
+                  <span className="text-sm font-semibold text-foreground">{item.percentual.toFixed(1)}%</span>
                 </div>
               ))}
             </div>
@@ -225,18 +225,18 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
 
         <div className={chartBaseClass + " 2xl:col-span-5"}>
           <div className="mb-4 flex items-center gap-3">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Layers3 className="h-5 w-5" />
             </span>
             <div>
-              <h3 className="font-semibold text-slate-950">Distribuicao por status</h3>
-              <p className="text-sm text-slate-500">Mapa do mes selecionado</p>
+              <h3 className="font-semibold text-foreground">Distribuição por status</h3>
+              <p className="text-sm text-muted">Mapa do mês selecionado</p>
             </div>
           </div>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={distribuicaoStatus} dataKey="value" nameKey="name" innerRadius={58} outerRadius={104} paddingAngle={4}>
+                <Pie data={distribuicaoStatus} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} paddingAngle={3}>
                   {distribuicaoStatus.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
@@ -250,12 +250,12 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
 
         <div className={chartBaseClass + " 2xl:col-span-7"}>
           <div className="mb-4 flex items-center gap-3">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <TrendingUp className="h-5 w-5" />
             </span>
             <div>
-              <h3 className="font-semibold text-slate-950">Tendencia de saldo</h3>
-              <p className="text-sm text-slate-500">Projecao acumulada com base nos ultimos meses</p>
+              <h3 className="font-semibold text-foreground">Tendência de saldo</h3>
+              <p className="text-sm text-muted">Projeção acumulada com base nos últimos meses</p>
             </div>
           </div>
           <div className="h-[320px]">
@@ -263,19 +263,19 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
               <AreaChart data={saldoTrend}>
                 <defs>
                   <linearGradient id="saldoGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563eb" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#2563eb" stopOpacity={0.04} />
+                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="#e5edf6" strokeDasharray="3 6" vertical={false} />
-                <XAxis dataKey="mes" tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+                <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
+                <XAxis dataKey="mes" tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
                 <Tooltip formatter={tooltipMoney} contentStyle={tooltipStyle} />
                 <Area
                   type="monotone"
                   dataKey="saldoProjetado"
-                  stroke="#1d4ed8"
-                  strokeWidth={3}
+                  stroke="var(--primary)"
+                  strokeWidth={2}
                   fill="url(#saldoGradient)"
                 />
               </AreaChart>
@@ -286,23 +286,23 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
         <div className={chartBaseClass + " 2xl:col-span-12"}>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-slate-950">Top gastos</h3>
-              <p className="text-sm text-slate-500">Itens de maior impacto financeiro no momento</p>
+              <h3 className="font-semibold text-foreground">Top gastos</h3>
+              <p className="text-sm text-muted">Itens de maior impacto financeiro no momento</p>
             </div>
-            <div className="text-sm text-slate-500">{topGastos.length} itens monitorados</div>
+            <div className="text-sm text-muted">{topGastos.length} itens monitorados</div>
           </div>
           <div className="grid grid-cols-1 gap-3 xl:grid-cols-5">
             {topGastos.map((item, index) => (
-              <div key={item.id} className="rounded-[22px] border border-slate-200 bg-slate-50/70 p-4">
-                <div className="mb-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-500 ring-1 ring-slate-200">
+              <div key={item.id} className="rounded-lg border border-border bg-surface p-4">
+                <div className="mb-3 inline-flex rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
                   #{index + 1}
                 </div>
-                <div className="text-base font-semibold text-slate-950">{item.descricao}</div>
-                <div className="mt-1 text-sm text-slate-500">{item.categoria}</div>
-                <div className="mt-4 text-xl font-semibold tracking-[-0.04em] text-rose-700">
+                <div className="text-base font-semibold text-foreground">{item.descricao}</div>
+                <div className="mt-1 text-sm text-muted">{item.categoria}</div>
+                <div className="mt-4 text-xl font-semibold tracking-[-0.04em] text-danger">
                   {money(item.valor)}
                 </div>
-                <div className="mt-2 text-sm text-slate-500">
+                <div className="mt-2 text-sm text-muted">
                   {item.vencimento ? `Vencimento em ${item.vencimento}` : "Sem data definida"}
                 </div>
               </div>
