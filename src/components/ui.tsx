@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { memo } from "react"
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Clock3, LucideIcon, Wallet } from "lucide-react"
 import { ReactNode } from "react"
 
@@ -15,7 +15,7 @@ export function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ")
 }
 
-export function ShellCard({
+export const ShellCard = memo(function ShellCard({
   children,
   className,
 }: {
@@ -23,19 +23,16 @@ export function ShellCard({
   className?: string
 }) {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+    <section
       className={cx(
-        "rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] shadow-[0_24px_80px_-36px_rgba(15,23,42,0.4),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur",
+        "rounded-[28px] border border-slate-200 bg-white shadow-sm",
         className
       )}
     >
       {children}
-    </motion.section>
+    </section>
   )
-}
+})
 
 export function SectionTitle({
   eyebrow,
@@ -64,7 +61,7 @@ export function SectionTitle({
   )
 }
 
-export function StatCard({
+export const StatCard = memo(function StatCard({
   icon: Icon,
   label,
   value,
@@ -78,32 +75,28 @@ export function StatCard({
   helper?: string
 }) {
   const tones = {
-    neutral: "from-slate-950 to-slate-700 text-white",
-    income: "from-emerald-700 to-emerald-500 text-white",
-    expense: "from-rose-700 to-rose-500 text-white",
-    warning: "from-amber-600 to-orange-400 text-white",
-    danger: "from-red-700 to-red-500 text-white",
+    neutral: "bg-slate-950 text-white",
+    income: "bg-emerald-700 text-white",
+    expense: "bg-rose-600 text-white",
+    warning: "bg-amber-500 text-slate-950",
+    danger: "bg-red-600 text-white",
   }
 
   return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      transition={{ duration: 0.2 }}
-      className="relative overflow-hidden rounded-[24px] border border-white/70 bg-[linear-gradient(180deg,#ffffff,#f8fafc)] p-5 shadow-[0_24px_50px_-30px_rgba(15,23,42,0.38),inset_0_1px_0_rgba(255,255,255,0.7)]"
-    >
-      <div className={cx("absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r", tones[tone])} />
-      <div className="absolute inset-x-6 top-16 h-20 rounded-full bg-slate-100/70 blur-2xl" />
-      <div className="mb-5 flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-500">{label}</span>
-        <span className={cx("inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br", tones[tone])}>
+    <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm">
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <div>
+          <div className="text-sm font-medium uppercase tracking-[0.12em] text-slate-500">{label}</div>
+          {helper ? <div className="mt-2 text-sm text-slate-500">{helper}</div> : null}
+        </div>
+        <span className={cx("inline-flex h-11 w-11 items-center justify-center rounded-2xl", tones[tone])}>
           <Icon className="h-5 w-5" />
         </span>
       </div>
       <div className="text-3xl font-semibold tracking-[-0.05em] text-slate-950">{value}</div>
-      {helper ? <div className="mt-2 text-sm text-slate-500">{helper}</div> : null}
-    </motion.div>
+    </div>
   )
-}
+})
 
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
@@ -152,7 +145,7 @@ export function PremiumInput(props: React.InputHTMLAttributes<HTMLInputElement>)
     <input
       {...props}
       className={cx(
-        "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100",
+        "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-sky-400 focus:ring-4 focus:ring-sky-100",
         props.className
       )}
     />
@@ -164,7 +157,7 @@ export function PremiumSelect(props: React.SelectHTMLAttributes<HTMLSelectElemen
     <select
       {...props}
       className={cx(
-        "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100",
+        "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-sky-400 focus:ring-4 focus:ring-sky-100",
         props.className
       )}
     />
@@ -180,21 +173,17 @@ export function PremiumButton({
   variant?: "primary" | "secondary" | "danger" | "ghost"
 }) {
   const variants = {
-    primary:
-      "bg-slate-950 text-white shadow-[0_14px_30px_-18px_rgba(15,23,42,0.8)] hover:bg-slate-800",
-    secondary:
-      "bg-sky-600 text-white shadow-[0_14px_30px_-18px_rgba(2,132,199,0.8)] hover:bg-sky-500",
-    danger:
-      "bg-rose-600 text-white shadow-[0_14px_30px_-18px_rgba(225,29,72,0.8)] hover:bg-rose-500",
-    ghost:
-      "bg-white/80 text-slate-700 border border-slate-200 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.5)] hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950",
+    primary: "bg-slate-950 text-white hover:bg-slate-800",
+    secondary: "bg-sky-600 text-white hover:bg-sky-500",
+    danger: "bg-rose-600 text-white hover:bg-rose-500",
+    ghost: "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:text-slate-950",
   }
 
   return (
     <button
       {...props}
       className={cx(
-        "inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-medium transition duration-200 disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
         className
       )}
@@ -212,7 +201,7 @@ export function EmptyState({
   description: string
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-slate-50/80 px-6 py-12 text-center">
+    <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
       <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm">
         <Wallet className="h-6 w-6 text-slate-400" />
       </div>

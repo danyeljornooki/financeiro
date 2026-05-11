@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import {
   Area,
@@ -44,11 +43,11 @@ function tooltipMoney(
 }
 
 const tooltipStyle = {
-  borderRadius: 20,
-  border: "1px solid rgba(226,232,240,0.9)",
-  background: "rgba(255,255,255,0.96)",
-  boxShadow: "0 18px 40px -24px rgba(15,23,42,0.35)",
-  padding: "10px 12px",
+  borderRadius: 16,
+  border: "1px solid rgba(226,232,240,0.95)",
+  background: "rgba(255,255,255,0.98)",
+  boxShadow: "0 16px 32px -18px rgba(15,23,42,0.22)",
+  padding: "10px 14px",
 }
 
 export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Props) {
@@ -151,7 +150,7 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
     })
   }, [serieMensal])
 
-  const chartBaseClass = "rounded-[28px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-6 shadow-[0_24px_60px_-34px_rgba(15,23,42,0.38),inset_0_1px_0_rgba(255,255,255,0.75)]"
+  const chartBaseClass = "rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-sm"
 
   return (
     <ShellCard className="p-6 md:p-7">
@@ -162,7 +161,7 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
       />
 
       <div className="mt-6 grid grid-cols-1 gap-5 2xl:grid-cols-12">
-        <motion.div className={chartBaseClass + " 2xl:col-span-7"} whileHover={{ y: -2 }}>
+        <div className={chartBaseClass + " 2xl:col-span-7"}>
           <div className="mb-4 flex items-center gap-3">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
               <CircleDollarSign className="h-5 w-5" />
@@ -185,9 +184,9 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div className={chartBaseClass + " 2xl:col-span-5"} whileHover={{ y: -2 }}>
+        <div className={chartBaseClass + " 2xl:col-span-5"}>
           <div className="mb-4 flex items-center gap-3">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
               <PieChartIcon className="h-5 w-5" />
@@ -222,9 +221,9 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
               ))}
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div className={chartBaseClass + " 2xl:col-span-5"} whileHover={{ y: -2 }}>
+        <div className={chartBaseClass + " 2xl:col-span-5"}>
           <div className="mb-4 flex items-center gap-3">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
               <Layers3 className="h-5 w-5" />
@@ -247,9 +246,9 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div className={chartBaseClass + " 2xl:col-span-7"} whileHover={{ y: -2 }}>
+        <div className={chartBaseClass + " 2xl:col-span-7"}>
           <div className="mb-4 flex items-center gap-3">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
               <TrendingUp className="h-5 w-5" />
@@ -282,9 +281,9 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div className={chartBaseClass + " 2xl:col-span-12"} whileHover={{ y: -2 }}>
+        <div className={chartBaseClass + " 2xl:col-span-12"}>
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-slate-950">Top gastos</h3>
@@ -309,7 +308,7 @@ export default function DashboardInsights({ refreshKey = 0, selectedMonth }: Pro
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </ShellCard>
   )

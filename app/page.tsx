@@ -17,38 +17,31 @@ import { SectionTitle, ShellCard } from "../src/components/ui"
 export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [currentSection, setCurrentSection] = useState("overview")
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toISOString().slice(0, 7)
-  )
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().slice(0, 7))
 
-  function atualizarLista() {
-    setRefreshKey((prev) => prev + 1)
-  }
+  const atualizarLista = () => setRefreshKey((prev) => prev + 1)
 
   useEffect(() => {
     let active = true
+    let interval: number | undefined
 
-    async function executarAutomacoes() {
+    const executarAutomacoes = async () => {
       await sincronizarAutomacoes()
-
-      if (active) {
-        setRefreshKey((prev) => prev + 1)
-      }
+      if (active) atualizarLista()
     }
 
     void executarAutomacoes()
-
-    const interval = window.setInterval(() => {
+    interval = window.setInterval(() => {
       void executarAutomacoes()
     }, 60000)
 
     return () => {
       active = false
-      window.clearInterval(interval)
+      if (interval) window.clearInterval(interval)
     }
   }, [])
 
-  async function sair() {
+  const sair = async () => {
     await fetch("/api/auth/logout", { method: "POST" })
     window.location.href = "/login"
   }
@@ -61,71 +54,73 @@ export default function Home() {
       currentSection={currentSection}
       onSectionChange={setCurrentSection}
     >
-      {currentSection === "overview" ? (
+      {currentSection === "overview" && (
         <div className="space-y-6">
-          <section id="overview">
-            <DashboardCards refreshKey={refreshKey} selectedMonth={selectedMonth} />
-          </section>
+          <DashboardCards refreshKey={refreshKey} selectedMonth={selectedMonth} />
           <AlertasVencimento refreshKey={refreshKey} />
           <ShellCard className="p-6">
             <SectionTitle
-              eyebrow="Operacao"
-              title="Movimentos do periodo"
-              description="Acesso rapido ao registro de receitas e despesas sem sair da visao geral."
+              eyebrow="Operação"
+              title="Entrada e saída rápida"
+              description="Registre receitas e despesas rapidamente sem perder o foco."
             />
-            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
               <AddReceita onSaved={atualizarLista} />
               <AddConta onSaved={atualizarLista} />
             </div>
           </ShellCard>
         </div>
-      ) : null}
+      )}
 
-      {currentSection === "receitas" ? (
-        <section id="receitas" className="space-y-6">
-          <AddReceita onSaved={atualizarLista} />
+      {currentSection === "receitas" && (
+        <section className="space-y-6">
           <ShellCard className="p-6">
-            <SectionTitle
-              eyebrow="Fluxo de caixa"
-              title="Receitas do periodo"
-              description="Visualize, ajuste e acompanhe entradas financeiras usando o filtro mensal global."
-            />
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <SectionTitle
+                eyebrow="Fluxo de caixa"
+                title="Receitas do período"
+                description="Acompanhe as entradas e ajuste detalhes com um filtro mensal global."
+              />
+              <AddReceita onSaved={atualizarLista} />
+            </div>
             <div className="mt-6">
               <ReceitasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
             </div>
           </ShellCard>
         </section>
-      ) : null}
+      )}
 
-      {currentSection === "despesas" ? (
-        <section id="despesas" className="space-y-6">
-          <AlertasVencimento refreshKey={refreshKey} />
-          <AddConta onSaved={atualizarLista} />
+      {currentSection === "despesas" && (
+        <section className="space-y-6">
           <ShellCard className="p-6">
-            <SectionTitle
-              eyebrow="Contas"
-              title="Despesas e compromissos"
-              description="Monitore despesas, status, recorrencias e historico em uma grade refinada."
-            />
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <SectionTitle
+                eyebrow="Contas"
+                title="Despesas e compromissos"
+                description="Veja status, vencimentos e histórico em uma visão compacta."
+              />
+              <AddConta onSaved={atualizarLista} />
+            </div>
             <div className="mt-6">
               <ContasTable refreshKey={refreshKey} selectedMonth={selectedMonth} />
             </div>
           </ShellCard>
+          <AlertasVencimento refreshKey={refreshKey} />
         </section>
-      ) : null}
+      )}
 
-      {currentSection === "analytics" ? (
-        <section id="analytics" className="space-y-6">
+      {currentSection === "analytics" && (
+        <section className="space-y-6">
           <DashboardInsights refreshKey={refreshKey} selectedMonth={selectedMonth} />
           <FinanceiroAvancado refreshKey={refreshKey} />
         </section>
-      ) : null}
+      )}
 
-      {currentSection === "security" ? (
-        <section id="security">
+      {currentSection === "security" && (
+        <section>
           <SecurityPanel refreshKey={refreshKey} />
         </section>
-      ) : null}
+      )}
     </AppShell>
   )
 }
