@@ -100,21 +100,21 @@ export const StatCard = memo(function StatCard({
 
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    receita: "bg-success/10 text-success border-success/20",
-    despesa: "bg-danger/10 text-danger border-danger/20",
-    pendente: "bg-warning/10 text-warning border-warning/20",
-    pago: "bg-success/10 text-success border-success/20",
-    atrasado: "bg-danger/10 text-danger border-danger/20",
-    mensal: "bg-primary/10 text-primary border-primary/20",
-    anual: "bg-primary/10 text-primary border-primary/20",
-    unica: "bg-muted/10 text-muted border-border",
+    receita: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    despesa: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+    pendente: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    pago: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    atrasado: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+    mensal: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    anual: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    unica: "bg-gray-500/10 text-gray-400 border-gray-500/20",
   }
 
   return (
     <span
       className={cx(
-        "inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold capitalize border",
-        map[status] ?? "bg-muted/10 text-muted border-border"
+        "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize border",
+        map[status] ?? "bg-gray-500/10 text-gray-400 border-gray-500/20"
       )}
     >
       {status}
@@ -145,7 +145,7 @@ export function PremiumInput(props: React.InputHTMLAttributes<HTMLInputElement>)
     <input
       {...props}
       className={cx(
-        "h-10 w-full rounded-lg border border-border bg-surface px-4 text-sm text-foreground placeholder:text-muted outline-none transition-colors duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
+        "h-10 w-full rounded-xl border border-[#232832] bg-[#151922] px-4 text-sm text-white placeholder:text-gray-400 outline-none transition-all duration-150 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20",
         props.className
       )}
     />
@@ -157,7 +157,7 @@ export function PremiumSelect(props: React.SelectHTMLAttributes<HTMLSelectElemen
     <select
       {...props}
       className={cx(
-        "h-10 w-full rounded-lg border border-border bg-surface px-4 text-sm text-foreground outline-none transition-colors duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20",
+        "h-10 w-full rounded-xl border border-[#232832] bg-[#151922] px-4 text-sm text-white outline-none transition-all duration-150 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20",
         props.className
       )}
     />
@@ -173,17 +173,17 @@ export function PremiumButton({
   variant?: "primary" | "secondary" | "danger" | "ghost"
 }) {
   const variants = {
-    primary: "bg-primary text-white hover:bg-primary/90",
-    secondary: "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20",
-    danger: "bg-danger text-white hover:bg-danger/90",
-    ghost: "bg-surface text-foreground border border-border hover:bg-surface/80",
+    primary: "bg-blue-600 text-white hover:bg-blue-700",
+    secondary: "bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20",
+    danger: "bg-rose-600 text-white hover:bg-rose-700",
+    ghost: "bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white",
   }
 
   return (
     <button
       {...props}
       className={cx(
-        "inline-flex h-10 items-center justify-center rounded-lg px-4 text-sm font-medium transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 hover:translate-y-[-1px]",
         variants[variant],
         className
       )}

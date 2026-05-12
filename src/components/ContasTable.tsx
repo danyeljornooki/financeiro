@@ -19,6 +19,7 @@ import {
   StatusBadge,
   money,
 } from "./ui"
+import { Sheet } from "./Sheet"
 
 type Props = {
   refreshKey?: number
@@ -34,19 +35,10 @@ type ContaForm = {
   tipo: Conta["tipo"]
 }
 
-function labelRecorrencia(conta: Conta) {
-  if (conta.parcela_total && conta.parcela_atual) {
-    return `${conta.parcela_atual}/${conta.parcela_total}`
-  }
-
-  if (conta.recorrencia === "mensal") return "mensal"
-  if (conta.recorrencia === "anual") return "anual"
-  return "unica"
-}
-
 export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
   const [contas, setContas] = useState<Conta[]>([])
-  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [editingConta, setEditingConta] = useState<Conta | null>(null)
   const [historicoAbertoId, setHistoricoAbertoId] = useState<string | null>(null)
   const [form, setForm] = useState<ContaForm>({
     descricao: "",
@@ -95,7 +87,7 @@ export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
   }
 
   function iniciarEdicao(conta: Conta) {
-    setEditandoId(conta.id)
+    setEditingConta(conta)
     setForm({
       descricao: conta.descricao,
       categoria: conta.categoria,
@@ -104,10 +96,26 @@ export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
       status: conta.status,
       tipo: conta.tipo,
     })
+    setSheetOpen(true)
   }
 
-  async function salvarEdicao(id: string) {
-    await editarConta(id, {
+  function fecharSheet() {
+    setSheetOpen(false)
+    setEditingConta(null)
+    setForm({
+      descricao: "",
+      categoria: "",
+      valor: "",
+      vencimento: "",
+      status: "pendente",
+      tipo: "despesa",
+    })
+  }
+
+  async function salvarEdicao() {
+    if (!editingConta) return
+
+    await editarConta(editingConta.id, {
       descricao: form.descricao,
       categoria: form.categoria,
       valor: Number(form.valor),
@@ -116,7 +124,7 @@ export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
       tipo: form.tipo,
     })
 
-    setEditandoId(null)
+    fecharSheet()
     await recarregar()
   }
 
@@ -143,7 +151,7 @@ export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
     <div>
       <SectionTitle
         eyebrow="Despesas"
-        title="Operacao de contas"
+        title="Operação de contas"
         description="Edite, duplique, quite e acompanhe compromissos com filtros refinados e leitura profissional."
         action={
           <div className="grid w-full grid-cols-1 gap-3 sm:w-auto sm:grid-cols-2">
@@ -173,150 +181,100 @@ export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
           />
         </div>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-[24px] border border-slate-200">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-white/5 bg-[#0f0f23]">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50/80">
-                <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  <th className="px-5 py-4">Descricao</th>
-                  <th className="px-5 py-4">Categoria</th>
-                  <th className="px-5 py-4">Valor</th>
-                  <th className="px-5 py-4">Vencimento</th>
-                  <th className="px-5 py-4">Recorrencia</th>
-                  <th className="px-5 py-4">Status</th>
-                  <th className="px-5 py-4 text-right">Acoes</th>
+            <table className="min-w-full">
+              <thead className="sticky top-0 bg-[#0f0f23]/80 backdrop-blur-sm">
+                <tr className="text-left">
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-400" style={{ minWidth: '240px', maxWidth: '320px' }}>Descrição</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-400" style={{ width: '120px' }}>Valor</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-400" style={{ width: '140px' }}>Vencimento</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-400" style={{ width: '110px' }}>Status</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-400 text-right" style={{ width: '140px' }}>Ações</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="divide-y divide-white/5">
                 {contasFiltradas.map((conta) => (
                   <Fragment key={conta.id}>
-                    <tr className="transition hover:bg-slate-50/80">
-                      <td className="px-5 py-4">
-                        {editandoId === conta.id ? (
-                          <PremiumInput
-                            value={form.descricao}
-                            onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                          />
-                        ) : (
-                          <div>
-                            <div className="font-medium text-slate-900">{conta.descricao}</div>
-                            <div className="text-sm text-slate-500">{conta.categoria}</div>
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        {editandoId === conta.id ? (
-                          <PremiumInput
-                            value={form.categoria}
-                            onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                          />
-                        ) : (
-                          <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                            {conta.categoria}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        {editandoId === conta.id ? (
-                          <PremiumInput
-                            type="number"
-                            value={form.valor}
-                            onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                          />
-                        ) : (
-                          <span className="text-base font-semibold text-rose-700">{money(conta.valor)}</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        {editandoId === conta.id ? (
-                          <PremiumInput
-                            type="date"
-                            value={form.vencimento}
-                            onChange={(e) => setForm({ ...form, vencimento: e.target.value })}
-                          />
-                        ) : (
-                          <span className="text-sm text-slate-600">{conta.vencimento || "-"}</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        <StatusBadge status={labelRecorrencia(conta)} />
-                      </td>
-                      <td className="px-5 py-4">
-                        {editandoId === conta.id ? (
-                          <PremiumSelect
-                            value={form.status}
-                            onChange={(e) => setForm({ ...form, status: e.target.value as Conta["status"] })}
-                          >
-                            <option value="pendente">pendente</option>
-                            <option value="pago">pago</option>
-                            <option value="atrasado">atrasado</option>
-                          </PremiumSelect>
-                        ) : (
-                          <StatusBadge status={conta.status} />
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex justify-end gap-2">
-                          {editandoId === conta.id ? (
-                            <>
-                              <PremiumButton onClick={() => salvarEdicao(conta.id)}>Salvar</PremiumButton>
-                              <PremiumButton variant="ghost" onClick={() => setEditandoId(null)}>
-                                Cancelar
-                              </PremiumButton>
-                            </>
-                          ) : (
-                            <>
-                              <PremiumButton variant="ghost" onClick={() => iniciarEdicao(conta)} className="gap-2 px-3">
-                                <Pencil className="h-4 w-4" />
-                              </PremiumButton>
-                              <PremiumButton variant="secondary" onClick={() => handlePagar(conta)} className="gap-2 px-3">
-                                <CheckCheck className="h-4 w-4" />
-                              </PremiumButton>
-                              <PremiumButton variant="ghost" onClick={() => handleDuplicar(conta)} className="gap-2 px-3">
-                                <Copy className="h-4 w-4" />
-                              </PremiumButton>
-                              <PremiumButton variant="danger" onClick={() => handleExcluir(conta.id)} className="gap-2 px-3">
-                                <Trash2 className="h-4 w-4" />
-                              </PremiumButton>
-                            </>
-                          )}
+                    <tr className="transition-colors duration-150 hover:bg-white/2" style={{ height: '64px' }}>
+                      <td className="px-4 py-3">
+                        <div>
+                          <div className="text-sm font-medium text-white">{conta.descricao}</div>
+                          <div className="text-xs text-gray-400">{conta.categoria}</div>
                         </div>
-                        {editandoId !== conta.id ? (
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm font-semibold text-rose-400">{money(conta.valor)}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm text-gray-300">{conta.vencimento || "-"}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={conta.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => iniciarEdicao(conta)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white/70 border border-white/10 transition-all duration-150 hover:bg-white/10 hover:text-white hover:translate-y-[-1px]"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handlePagar(conta)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white/70 border border-white/10 transition-all duration-150 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/30 hover:translate-y-[-1px]"
+                          >
+                            <CheckCheck className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDuplicar(conta)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white/70 border border-white/10 transition-all duration-150 hover:bg-white/10 hover:text-white hover:translate-y-[-1px]"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleExcluir(conta.id)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white/70 border border-white/10 transition-all duration-150 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/30 hover:translate-y-[-1px]"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {historicoAbertoId !== conta.id ? (
                           <button
                             type="button"
                             onClick={() =>
                               setHistoricoAbertoId(historicoAbertoId === conta.id ? null : conta.id)
                             }
-                            className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 transition hover:text-slate-900"
+                            className="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-400 transition-colors hover:text-white"
                           >
-                            {historicoAbertoId === conta.id ? "Ocultar historico" : "Ver historico"}
+                            {historicoAbertoId === conta.id ? "Ocultar histórico" : "Ver histórico"}
                           </button>
                         ) : null}
                       </td>
                     </tr>
 
                     {historicoAbertoId === conta.id ? (
-                      <tr className="bg-slate-50/80">
-                        <td colSpan={7} className="px-5 py-4">
+                      <tr className="bg-white/5">
+                        <td colSpan={5} className="px-4 py-4">
                           {conta.historico_pagamentos && conta.historico_pagamentos.length > 0 ? (
                             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                               {conta.historico_pagamentos.map((item, index) => (
-                                <div key={`${conta.id}-${index}`} className="rounded-[20px] border border-slate-200 bg-white p-4">
+                                <div key={`${conta.id}-${index}`} className="rounded-2xl border border-white/10 bg-[#0f0f23] p-4">
                                   <div className="mb-2 flex items-center justify-between">
                                     <StatusBadge status={item.status} />
-                                    <span className="text-xs text-slate-500">
+                                    <span className="text-xs text-gray-400">
                                       {new Date(item.data).toLocaleDateString("pt-BR")}
                                     </span>
                                   </div>
-                                  <div className="text-lg font-semibold text-slate-950">{money(item.valor)}</div>
-                                  <div className="mt-1 text-sm text-slate-500">{item.observacao}</div>
+                                  <div className="text-lg font-semibold text-white">{money(item.valor)}</div>
+                                  <div className="mt-1 text-sm text-gray-400">{item.observacao}</div>
                                 </div>
                               ))}
                             </div>
                           ) : (
                             <EmptyState
-                              title="Historico vazio"
-                              description="Pagamentos realizados nesta conta aparecerao aqui com contexto e rastreabilidade."
+                              title="Histórico vazio"
+                              description="Pagamentos realizados nesta conta aparecerão aqui com contexto e rastreabilidade."
                             />
                           )}
                         </td>
@@ -329,6 +287,63 @@ export default function ContasTable({ refreshKey = 0, selectedMonth }: Props) {
           </div>
         </div>
       )}
+
+      <Sheet isOpen={sheetOpen} onClose={fecharSheet} title="Editar Conta">
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Descrição</label>
+            <PremiumInput
+              value={form.descricao}
+              onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+              placeholder="Digite a descrição"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Categoria</label>
+            <PremiumInput
+              value={form.categoria}
+              onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+              placeholder="Digite a categoria"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Valor</label>
+            <PremiumInput
+              type="number"
+              value={form.valor}
+              onChange={(e) => setForm({ ...form, valor: e.target.value })}
+              placeholder="0,00"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Vencimento</label>
+            <PremiumInput
+              type="date"
+              value={form.vencimento}
+              onChange={(e) => setForm({ ...form, vencimento: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Status</label>
+            <PremiumSelect
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value as Conta["status"] })}
+            >
+              <option value="pendente">Pendente</option>
+              <option value="pago">Pago</option>
+              <option value="atrasado">Atrasado</option>
+            </PremiumSelect>
+          </div>
+          <div className="flex gap-3 pt-4 border-t border-white/5">
+            <PremiumButton onClick={salvarEdicao} className="flex-1">
+              Salvar
+            </PremiumButton>
+            <PremiumButton variant="ghost" onClick={fecharSheet} className="flex-1">
+              Cancelar
+            </PremiumButton>
+          </div>
+        </div>
+      </Sheet>
     </div>
   )
 }
